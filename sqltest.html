@@ -1,0 +1,42 @@
+<html>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js></script>
+    <style>
+        .card{
+            width:200px;
+            padding:10px;
+            margin:10px;
+            background-color:bisque;
+            box-shadow:2px 2px 2px black;
+            border-radius:10px;
+            float:left;
+        }
+    </style>
+    <script id="template" type="x-tmpl-mustache">
+            <div class="card">
+                 <h2>{{ CustomerId }}</h2>
+                 <hr>
+                 <h3>{{ LastName }}</h3>
+            </div>
+    </script>
+    <script>
+        var data;
+        $(document).ready(function(){
+            $.get('/data',function(result){
+                data = JSON.parse(result);
+                console.log("Data Loaded");
+                var template = $('#template').html();
+                var build = ""
+                for(var i = 0; i < data.length; i++){
+                    build += Mustache.render(template, data[i]);
+                }
+                $('#output').html(build);
+            })
+        })
+    </script>
+    <body>
+        <div id="output">
+
+        </div>
+    </body>
+</html>
