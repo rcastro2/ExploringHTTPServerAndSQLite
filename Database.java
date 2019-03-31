@@ -1,39 +1,76 @@
 import java.sql.*;
 
 public class Database{
+    private String url;
     private Connection conn;
-    
+
     public Database(String url){
+        this.url = url;
+    }
+    private boolean connect(){
+        boolean success = true;
         try{
             //Create a connection to the database
             conn = DriverManager.getConnection(url);
-            System.out.println("Connection to SQLite has been established.");    
+            //System.out.println("Connection to SQLite has been established.");    
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            success = false;
         } 
+        return success;
+    }
+    private boolean close(){
+       boolean success = true;
+        try{
+            //Close the connection to the database
+            conn.close();   
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            success = false;
+        }
+        return success; 
     }
     public String selectData(String sql){
-        int pos = sql.toUpperCase().indexOf("FROM");
-        String fields[] = sql.substring(7,pos).replaceAll(" ","").split(",");
-        
-        String build = "[";
+        String result = "";
+        connect();
+        //System.out.println(sql);
         try (Statement stmt  = conn.createStatement();
             ResultSet rs    = stmt.executeQuery(sql)){
             
+            //Get field names            
+            ResultSetMetaData metadata = rs.getMetaData();
+            int columnCount = metadata.getColumnCount();   
+
+            String field, build = "[";
             // loop through the result set
             while (rs.next()) {
                 build += "{";
-                for(String field: fields){
+                for (int i = 1; i <= columnCount; i++) {
+                    field = metadata.getColumnName(i);
                     build += "\"" + field + "\":\"" + rs.getString(field) + "\",";
                 }
                 build = build.substring(0,build.length()-1) + "},";
             }
+            result = build.substring(0,build.length()-1) + "]";
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } finally {
+            close();
         }
-        return build.substring(0,build.length()-1) + "]";
+        return result;
     }
-    public void runQuery(String query){
-    
+    public boolean runQuery(String sql){
+        boolean success = true;
+        connect();
+        try (Statement stmt  = conn.createStatement()){
+            stmt.executeUpdate(sql);
+            conn.commit();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            success = false;
+        } finally {     
+            close();
+            return success;
+        }
     }
 }

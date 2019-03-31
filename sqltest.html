@@ -22,7 +22,7 @@
     <script>
         var data;
         $(document).ready(function(){
-            $.get('/data',function(result){
+            $.get('/customers',function(result){
                 data = JSON.parse(result);
                 console.log("Data Loaded");
                 var template = $('#template').html();
