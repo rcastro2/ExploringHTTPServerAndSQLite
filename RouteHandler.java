@@ -26,11 +26,11 @@ public class RouteHandler implements HttpHandler {
         this.contentType = "text/json";
     }
     public void handle(HttpExchange exchange) throws IOException {
-      //Headers h = exchange.getResponseHeaders();
-      //h.add( "Content-Type", this.contentType );
       if(this.contentType.equals("text/json")){
           this.response = this.db.selectData(sql);
       }
+      exchange.getResponseHeaders().add( "Content-Type", this.contentType );
+      exchange.getResponseHeaders().add("Access-Control-Allow-Origin","*");
       exchange.sendResponseHeaders(200, response.length());
       OutputStream os = exchange.getResponseBody();
       os.write(response.getBytes());
