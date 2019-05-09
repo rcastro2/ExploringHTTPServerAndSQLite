@@ -44,6 +44,7 @@ public class Database{
         }
         return result;
     }
+
     public boolean runQuery(String sql){
         boolean success = true;
         connect();
@@ -65,13 +66,14 @@ public class Database{
             ResultSetMetaData metadata = rs.getMetaData();
             int columnCount = metadata.getColumnCount();   
 
-            String field, build = "[";
+            String field, value, build = "[";
             // loop through the result set
             while (rs.next()) {
                 build += "{";
                 for (int i = 1; i <= columnCount; i++) {
                     field = metadata.getColumnName(i);
-                    build += "\"" + field + "\":\"" + rs.getString(field) + "\",";
+                    value = rs.getString(field);
+                    build += "\"" + field + "\":\"" + value + "\",";
                 }
                 build = build.substring(0,build.length()-1) + "},";
             }

@@ -22,7 +22,7 @@
     <script>
         var data;
         $(document).ready(function(){
-            $.get('/customers',function(result){
+            $.get('http://localhost:8500/customers',function(result){
                 data = JSON.parse(result);
                 console.log("Data Loaded");
                 var template = $('#template').html();

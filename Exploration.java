@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.sql.*;
-//javac -cp sqlite-jdbc-3.23.1.jar; BasicHttpServerExample.java
+//javac -cp sqlite-jdbc-3.23.1.jar; Exploration.java
 
-public class BasicHttpServerExplore {
+public class Exploration {
 
     public static void main(String[] args) throws IOException {
         int port = (args.length == 0)?8500:Integer.parseInt(args[0]);

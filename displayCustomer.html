@@ -1,0 +1,63 @@
+<html>
+    <meta http-equiv="content-type" content="text/html; charset=utf-16" />
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js></script>
+    <style>
+        .card{
+            width:200px;
+            padding:10px;
+            margin:10px;
+            background-color:bisque;
+            box-shadow:2px 2px 2px black;
+            border-radius:10px;
+            margin:0 auto;
+        }
+    </style>
+    <script id="template_customer" type="x-tmpl-mustache">
+            <div class="card">
+                 <h2>{{ CustomerId }}</h2>
+                 <hr>
+                 {{FirstName}} {{ LastName }}
+                 <hr>
+                 {{Address}}<br>{{City}} {{State}} {{Country}} <br> {{PostalCode}}
+                 <hr>
+                 {{Email}}
+            </div>
+    </script>
+    <script id="template_dropdown" type="x-tmpl-mustache">
+            <option value="{{CustomerId}}"> {{ FirstName }} {{ LastName }} </option>
+    </script>
+    <script>
+        var data;
+        $(document).ready(function(){
+            $.get('http://localhost:8500/customers',function(result){
+                data = JSON.parse(result);
+                console.log("Data Loaded");
+                var template_dropdown = $("#template_dropdown").html();
+                var build = ""
+                for(var i = 0; i < data.length; i++){
+                    console.log(escape(data[i].LastName));
+                    build += Mustache.render(template_dropdown,data[i]);
+                }
+                $('#customers').html(build);
+            })
+            $("#customers").click(function(){
+                $.get('http://localhost:8500/getCustomer?id=' + this.value,function(result){
+                    data = JSON.parse(result);
+                    var template_customer = $("#template_customer").html();
+                    var build = ""
+                    for(var i = 0; i < data.length; i++){
+                        build += Mustache.render(template_customer,data[i]);
+                    }
+                    $('#output').html(build);
+                })
+            })
+        })
+    </script>
+    <body>
+        <select id="customers"></select>
+        <div id="output">
+
+        </div>
+    </body>
+</html>

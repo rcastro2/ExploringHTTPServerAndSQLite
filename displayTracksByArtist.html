@@ -1,0 +1,91 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <style>
+        #artists{
+            width:200px;
+            background-color:lightgrey;
+        }
+        #tracks{
+            width:600px;
+            background-color:yellow;
+            margin:0 auto;
+        }
+        div{
+            display:inline-block;
+        }
+    </style>
+    <script id="card" type="x-tmpl-mustache">        
+        <div class="card">
+            <div class="card-header" id="heading{{GenreId}}">
+            <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#G{{GenreId}}" aria-expanded="true" aria-controls="G{{GenreId}}">
+                {{Genre}}
+                </button>
+            </h5>
+            </div>
+                  
+            <div id="G{{GenreId}}" class="collapse" aria-labelledby="heading{{GenreId}}" data-parent="#accordion">
+            <div class="card-body">
+                
+                {{#Artists}}
+                <li><a onclick="getTracks({{ArtistId}})">{{Name}}</a></li>
+                {{/Artists}}
+                
+            </div>
+            </div>
+        </div>
+    </script>
+    <script>
+        var data;
+        $(document).ready(function(){
+            $.get('http://localhost:8500/artistsbygenre',function(result){
+                data = JSON.parse(result);
+                var build = "", artists = [];
+                var card = $("#card").html()
+                var oldGenre = data[0].Genre;
+                var oldGenreId = data[0].GenreId;
+                for(var i = 0; i < data.length; i++){
+                    if(oldGenre != data[i].Genre){
+                        build += Mustache.render(card,{"Genre":oldGenre,"GenreId":oldGenreId,"Artists":artists});
+                        artists = [{"Name":data[i].Name,"ArtistId":data[i].ArtistId}];
+                        oldGenre = data[i].Genre;
+                        oldGenreId = data[i].GenreId;
+                    }else{
+                        artists.push({"Name":data[i].Name,"ArtistId":data[i].ArtistId});
+                    }       
+                }
+
+                $('#accordion').html(build);
+            })
+        })
+        var getTracks = function(id){
+                $.get('http://localhost:8500/tracksbyartist?id=' + id,function(result){
+                    data = JSON.parse(result);
+                    var build = ""
+                    for(var i = 0; i < data.length; i++){
+                        build += data[i].Name + " / " + data[i].Title + "<br>";
+                    }
+                    alert(build);
+                })
+            }
+    </script>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div id="accordion" style="width:100%">
+
+                    </div>
+                </div>
+                <div class="col-7">
+
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
